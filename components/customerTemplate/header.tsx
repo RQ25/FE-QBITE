@@ -20,10 +20,10 @@ export default function CustomerHeader({
 }: CustomerHeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-[#FCF0E4]/95 backdrop-blur-md border-b border-[#E8E2D9]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
-        {/* Brand Logo (Mempertahankan warna asli logo) */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-[#245F52] flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#19483F] transition">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Brand Logo (shrink-0 agar tidak gepeng di layar HP) */}
+        <Link href="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0 group">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-[#245F52] flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#19483F] transition">
             <Image
               alt="Q-Bite Logo"
               width={32}
@@ -32,17 +32,17 @@ export default function CustomerHeader({
               className="w-full h-full object-contain"
             />
           </div>
-          <div>
-            <span className="font-extrabold text-xl tracking-tight text-[#245F52] block leading-none">
+          <div className="min-w-0">
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-[#245F52] block leading-none truncate">
               Q-Bite
             </span>
-            <span className="text-[11px] font-medium text-[#777D78] block mt-0.5">
+            <span className="hidden sm:block text-[11px] font-medium text-[#777D78] mt-0.5 truncate">
               Pre-Order Kantin MB ITS
             </span>
           </div>
         </Link>
 
-        {/* Navigasi Tengah */}
+        {/* Navigasi Tengah (Desktop) */}
         <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-[#292D2B]">
           <Link href="/#jadwal" className="hover:text-[#245F52] transition">
             Jadwal Sesi
@@ -71,15 +71,15 @@ export default function CustomerHeader({
           )}
         </nav>
 
-        {/* Action Buttons Kanan */}
-        <div className="flex items-center gap-2.5">
+        {/* Action Buttons Kanan (shrink-0 & compact di HP) */}
+        <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
           {onOpenOrders && (
             <button
               type="button"
               onClick={onOpenOrders}
-              className="md:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[#E8E2D9] text-xs font-semibold text-[#292D2B] hover:border-[#245F52] transition cursor-pointer"
+              className="md:hidden inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white border border-[#E8E2D9] text-xs font-semibold text-[#292D2B] hover:border-[#245F52] transition cursor-pointer"
             >
-              <Receipt className="w-3.5 h-3.5 text-[#245F52]" />
+              <Receipt className="w-3.5 h-3.5 shrink-0 text-[#245F52]" />
               <span>Orders</span>
               {recentOrdersCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-[#245F52] text-white text-[10px] flex items-center justify-center font-bold">
@@ -93,18 +93,18 @@ export default function CustomerHeader({
             <button
               type="button"
               onClick={onOpenCart}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#ED7134] hover:bg-[#C95724] text-white text-xs sm:text-sm font-bold shadow-sm transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2.5 rounded-xl bg-[#ED7134] hover:bg-[#C95724] text-white text-xs sm:text-sm font-bold shadow-sm transition cursor-pointer"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
               <span>Cart</span>
-              <span className="px-2 py-0.5 rounded-lg bg-white/20 text-white text-xs font-extrabold">
+              <span className="px-1.5 sm:px-2 py-0.5 rounded-lg bg-white/20 text-white text-[11px] sm:text-xs font-extrabold">
                 {cartCount}
               </span>
             </button>
           ) : (
             <Link
               href="/login"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#DCEAE5] border border-[#E8E2D9] text-[#245F52] transition"
+              className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#DCEAE5] border border-[#E8E2D9] text-[#245F52] transition"
             >
               Portal Pengurus
             </Link>

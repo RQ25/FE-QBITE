@@ -336,35 +336,35 @@ export default function CustomerOrderPage() {
     >
       <ToastContainer containerId="toastCustomer" />
 
-      <div className="space-y-10 pb-24">
+      <div className="space-y-8 sm:space-y-10 pb-24">
         {/* 1. HERO SECTION */}
-        <section className="rounded-3xl bg-[#245F52] text-white p-6 sm:p-10 relative overflow-hidden shadow-sm">
+        <section className="rounded-3xl bg-[#245F52] text-white p-5 sm:p-10 relative overflow-hidden shadow-sm">
           <div className="absolute -right-12 -bottom-12 w-56 h-56 rounded-full bg-[#19483F] pointer-events-none" />
           <div className="absolute right-12 top-6 w-20 h-20 rounded-2xl rotate-12 bg-[#F8CF5F]/15 pointer-events-none" />
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             <div className="lg:col-span-8 space-y-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#19483F] text-[#F8CF5F] text-xs font-bold tracking-wide">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#19483F] text-[#F8CF5F] text-[11px] sm:text-xs font-bold tracking-wide">
                 Pre-Order Kantin MB ITS • Bebas Antre
               </span>
               <h1 className="text-2xl sm:text-4xl font-extrabold leading-tight tracking-tight">
                 Makan Siang Harga Kantin,{" "}
                 <span className="text-[#F8CF5F]">Siap Ambil Pas Jeda Kelas.</span>
               </h1>
-              <p className="text-sm sm:text-base text-[#DCEAE5] max-w-2xl leading-relaxed">
+              <p className="text-xs sm:text-base text-[#DCEAE5] max-w-2xl leading-relaxed">
                 Gabungkan menu favorit dari berbagai kantin kampus dalam sekali pesan sebelum jam
                 tutup sesi. Bayar praktis pakai QRIS, lalu tinggal ambil pakai PIN.
               </p>
-              <div className="pt-1 flex flex-wrap items-center gap-3">
+              <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                 <a
                   href="#jadwal"
-                  className="px-5 py-3 rounded-xl bg-[#ED7134] hover:bg-[#C95724] text-white text-sm font-bold inline-flex items-center gap-2 transition shadow-sm"
+                  className="w-full sm:w-auto justify-center px-5 py-3 rounded-xl bg-[#ED7134] hover:bg-[#C95724] text-white text-sm font-bold inline-flex items-center gap-2 transition shadow-sm"
                 >
                   Mulai Pesan Sekarang <ArrowRight className="w-4 h-4" />
                 </a>
                 <a
                   href="#menu"
-                  className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold transition"
+                  className="w-full sm:w-auto text-center px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold transition"
                 >
                   Lihat Daftar Menu
                 </a>
@@ -373,7 +373,7 @@ export default function CustomerOrderPage() {
 
             {/* Kartu Ringkas Pesanan Aktif Khusus Perangkat Ini */}
             <div className="lg:col-span-4">
-              <div className="rounded-2xl bg-[#19483F] border border-white/15 p-5 space-y-3">
+              <div className="rounded-2xl bg-[#19483F] border border-white/15 p-4 sm:p-5 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-[#F8CF5F]">
                     Status Pesanan Kamu
@@ -414,7 +414,7 @@ export default function CustomerOrderPage() {
           </div>
         </section>
 
-        {/* 2. TODAY'S SCHEDULE (scroll-mt-24 agar tidak tertutup sticky header saat diklik) */}
+        {/* 2. TODAY'S SCHEDULE */}
         <section
           id="jadwal"
           className="scroll-mt-24 rounded-2xl bg-[#FFF9F2] border border-[#E8E2D9] p-5 sm:p-7 space-y-6 shadow-sm"
@@ -520,7 +520,7 @@ export default function CustomerOrderPage() {
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-xl bg-[#FBE4D6] text-[#ED7134] flex items-center justify-center">
+                <span className="w-8 h-8 rounded-xl bg-[#FBE4D6] text-[#ED7134] flex items-center justify-center shrink-0">
                   <Flame className="w-4 h-4" />
                 </span>
                 <div>
@@ -626,7 +626,7 @@ export default function CustomerOrderPage() {
           </section>
         )}
 
-        {/* 4. CANTEEN SELECTION & SEMUA MENU (scroll-mt-24 agar pas di bawah sticky header) */}
+        {/* 4. CANTEEN SELECTION & SEMUA MENU */}
         <section id="menu" className="scroll-mt-24 space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -673,7 +673,7 @@ export default function CustomerOrderPage() {
                     : "bg-white text-[#292D2B] border-[#E8E2D9] hover:border-[#245F52]"
                 }`}
               >
-                <Store className="w-3.5 h-3.5" />
+                <Store className="w-3.5 h-3.5 shrink-0" />
                 {c.name}
                 {!c.isOpen && (
                   <span className="px-1.5 py-0.5 rounded bg-[#FCE5E3] text-[#B93832] text-[10px]">
@@ -854,7 +854,7 @@ export default function CustomerOrderPage() {
             className="w-full p-4 rounded-2xl bg-[#ED7134] hover:bg-[#C95724] text-white shadow-xl flex items-center justify-between cursor-pointer transition"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-black/15 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-black/15 flex items-center justify-center shrink-0">
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <div className="text-left">
@@ -862,7 +862,7 @@ export default function CustomerOrderPage() {
                 <p className="text-base font-extrabold">{formatRupiah(subtotalAmount)}</p>
               </div>
             </div>
-            <span className="px-4 py-2 rounded-xl bg-white text-[#ED7134] text-xs font-extrabold inline-flex items-center gap-1.5">
+            <span className="px-4 py-2 rounded-xl bg-white text-[#ED7134] text-xs font-extrabold inline-flex items-center gap-1.5 shrink-0">
               Lanjut Checkout <ArrowRight className="w-4 h-4" />
             </span>
           </button>
