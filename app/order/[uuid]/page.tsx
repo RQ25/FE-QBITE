@@ -343,10 +343,11 @@ export default function OrderTrackingPage() {
           {/* Live Countdown Timer (Jika PENDING_PAYMENT / REJECTED) */}
           {(order.status === "PENDING_PAYMENT" || order.status === "REJECTED") && (
             <div
-              className={`p-4 rounded-xl border flex items-center justify-between ${isTimeUp
-                ? "bg-[#FCE5E3] border-[#B93832]/30 text-[#B93832]"
-                : "bg-[#FFF4D5] border-[#F8CF5F] text-[#946200]"
-                }`}
+              className={`p-4 rounded-xl border flex items-center justify-between ${
+                isTimeUp
+                  ? "bg-[#FCE5E3] border-[#B93832]/30 text-[#B93832]"
+                  : "bg-[#FFF4D5] border-[#F8CF5F] text-[#946200]"
+              }`}
             >
               <div className="flex items-center gap-2.5">
                 <Clock className="w-5 h-5 shrink-0" />
@@ -590,7 +591,12 @@ export default function OrderTrackingPage() {
               <div className="w-full max-h-64 rounded-xl overflow-hidden bg-white border border-[#E8E2D9] flex items-center justify-center p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`${BASE_IMAGE_PROOF}/${uploadedProofFilename}`}
+                  src={
+                    uploadedProofFilename.startsWith("data:") ||
+                    uploadedProofFilename.startsWith("http")
+                      ? uploadedProofFilename
+                      : `${BASE_IMAGE_PROOF}/${uploadedProofFilename}`
+                  }
                   alt="Bukti Transfer Terunggah"
                   className="max-h-60 object-contain rounded-lg"
                 />
