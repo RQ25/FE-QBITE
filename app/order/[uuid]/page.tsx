@@ -444,7 +444,7 @@ export default function OrderTrackingPage() {
                 </div>
               </div>
 
-              {/* Kolom Kanan: Upload Form */}
+              {/* Kolom Kanan: Upload Form (Kompatibel Android & iOS) */}
               <form onSubmit={handleUploadProof} className="space-y-4">
                 <div>
                   <h3 className="font-extrabold text-base text-[#292D2B]">
@@ -459,22 +459,31 @@ export default function OrderTrackingPage() {
                   </p>
                 </div>
 
-                <label className="block border-2 border-dashed border-[#245F52]/40 hover:border-[#ED7134] rounded-2xl p-4 text-center cursor-pointer transition bg-white">
+                <div className="relative border-2 border-dashed border-[#245F52]/40 hover:border-[#ED7134] active:border-[#ED7134] rounded-2xl p-4 text-center transition bg-white overflow-hidden">
                   <input
                     type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                    onChange={(e) => handleFileSelect(e.target.files?.[0])}
-                    className="hidden"
+                    accept="image/*"
+                    aria-label="Pilih foto bukti transfer"
+                    onChange={(e) => {
+                      handleFileSelect(e.target.files?.[0]);
+                      e.target.value = "";
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   {previewUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={previewUrl}
-                      alt="Preview Bukti Bayar"
-                      className="max-h-48 mx-auto rounded-xl object-contain"
-                    />
+                    <div className="space-y-2 pointer-events-none">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={previewUrl}
+                        alt="Preview Bukti Bayar"
+                        className="max-h-48 mx-auto rounded-xl object-contain"
+                      />
+                      <p className="text-[11px] font-semibold text-[#245F52]">
+                        Ketuk area ini untuk mengganti foto
+                      </p>
+                    </div>
                   ) : (
-                    <div className="py-6 space-y-2">
+                    <div className="py-6 space-y-2 pointer-events-none">
                       <div className="w-11 h-11 rounded-xl bg-[#FBE4D6] text-[#ED7134] flex items-center justify-center mx-auto">
                         <Upload className="w-5 h-5" />
                       </div>
@@ -484,7 +493,7 @@ export default function OrderTrackingPage() {
                       <p className="text-[11px] text-[#777D78]">JPG, PNG, atau WEBP (Maks. 3MB)</p>
                     </div>
                   )}
-                </label>
+                </div>
 
                 <button
                   type="submit"
