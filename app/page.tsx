@@ -43,6 +43,14 @@ interface EnrichedMenu extends IMenu {
 const DELIVERY_FEE_DROP_POINT = 2000;
 const STORAGE_HISTORY_KEY = "qbite_recent_orders";
 
+const resolveMenuImage = (raw: string | null | undefined) => {
+  if (!raw) return null;
+  if (raw.startsWith("data:") || raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw;
+  }
+  return `${BASE_IMAGE_MENU}/${raw}`;
+};
+
 const getUpcomingDates = () => {
   const dates: { value: string; dayName: string; label: string; isToday: boolean }[] = [];
   const nowWib = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
@@ -114,7 +122,6 @@ export default function CustomerOrderPage() {
         const parsed: SavedOrderHistory[] = JSON.parse(raw);
         if (!Array.isArray(parsed) || parsed.length === 0) return;
 
-        // Pastikan hanya order yang masih eksis di database yang tampil di perangkat ini
         const checks = await Promise.all(
           parsed.map(async (item) => {
             const res = await get(`/orders/${item.id}`);
@@ -327,6 +334,27 @@ export default function CustomerOrderPage() {
       maximumFractionDigits: 0,
     }).format(num);
 
+  const renderQuotaLabel = (menu: EnrichedMenu, quotaLeft: number | null | undefined) => {
+    if (menu.canteen?.isOpen === false) {
+      return <p className="text-[11px] font-medium text-[#B93832]">Kantin sedang tutup</p>;
+    }
+    if (!menu.isAvailable) {
+      return <p className="text-[11px] font-medium text-[#B93832]">Stok habis</p>;
+    }
+    if (quotaLeft !== null && quotaLeft !== undefined) {
+      return (
+        <p
+          className={`text-[11px] font-medium ${
+            quotaLeft <= 5 ? "text-[#C95724]" : "text-[#777D78]"
+          }`}
+        >
+          {quotaLeft > 0 ? `Sisa kuota: ${quotaLeft} porsi` : "Kuota habis"}
+        </p>
+      );
+    }
+    return <p className="text-[11px] font-medium text-[#246B40]">Kuota: Tersedia</p>;
+  };
+
   return (
     <CustomerTemplate
       cartCount={totalItems}
@@ -535,7 +563,7 @@ export default function CustomerOrderPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {popularMenus.map((menu) => {
                 const qty = getItemQty(menu.id);
-                const imgFile = getMenuImage(menu);
+                const imgSrc = resolveMenuImage(getMenuImage(menu));
                 const quotaLeft =
                   menu.remainingQuota !== null && menu.remainingQuota !== undefined
                     ? menu.remainingQuota
@@ -549,10 +577,10 @@ export default function CustomerOrderPage() {
                   >
                     <div>
                       <div className="h-40 bg-[#DCEAE5] relative overflow-hidden">
-                        {imgFile ? (
+                        {imgSrc ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={`${BASE_IMAGE_MENU}/${imgFile}`}
+                            src={imgSrc}
                             alt={menu.name}
                             className="w-full h-full object-cover"
                           />
@@ -582,9 +610,7 @@ export default function CustomerOrderPage() {
                         <p className="font-extrabold text-base text-[#292D2B]">
                           {formatRupiah(menu.price)}
                         </p>
-                        {quotaLeft !== null && quotaLeft !== undefined && (
-                          <p className="text-[11px] text-[#777D78]">Sisa {quotaLeft} porsi</p>
-                        )}
+                        {renderQuotaLabel(menu, quotaLeft)}
                       </div>
 
                       {soldOut ? (
@@ -711,7 +737,7 @@ export default function CustomerOrderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredMenus.map((menu) => {
                 const qty = getItemQty(menu.id);
-                const imgFile = getMenuImage(menu);
+                const imgSrc = resolveMenuImage(getMenuImage(menu));
                 const canteenClosed = menu.canteen?.isOpen === false;
                 const quotaLeft =
                   menu.remainingQuota !== null && menu.remainingQuota !== undefined
@@ -731,10 +757,10 @@ export default function CustomerOrderPage() {
                   >
                     <div>
                       <div className="h-44 bg-[#DCEAE5] relative overflow-hidden">
-                        {imgFile ? (
+                        {imgSrc ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={`${BASE_IMAGE_MENU}/${imgFile}`}
+                            src={imgSrc}
                             alt={menu.name}
                             className="w-full h-full object-cover"
                           />
@@ -778,11 +804,7 @@ export default function CustomerOrderPage() {
                         <p className="font-extrabold text-base text-[#292D2B]">
                           {formatRupiah(menu.price)}
                         </p>
-                        {quotaLeft !== null && quotaLeft !== undefined && (
-                          <p className="text-[11px] font-medium text-[#777D78]">
-                            Sisa kuota: {quotaLeft} porsi
-                          </p>
-                        )}
+                        {renderQuotaLabel(menu, quotaLeft)}
                       </div>
 
                       {!unavailable && (
