@@ -8,7 +8,11 @@ import EditMenu from "./editMenu";
 import DeleteMenu from "./deleteMenu";
 import { UtensilsCrossed } from "lucide-react";
 
-const getMenus = async (search: string): Promise<IMenu[]> => {
+interface EnrichedMenu extends IMenu {
+  imageUrl?: string | null;
+}
+
+const getMenus = async (search: string): Promise<EnrichedMenu[]> => {
   try {
     const TOKEN = (await getCookies("token")) || "";
     const url = `/menus?search=${encodeURIComponent(search)}`;
@@ -35,6 +39,14 @@ const getCanteens = async (): Promise<ICanteen[]> => {
     console.error("Error fetching canteens:", error);
     return [];
   }
+};
+
+const resolveMenuImg = (raw: string | null | undefined) => {
+  if (!raw) return "";
+  if (raw.startsWith("data:") || raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw;
+  }
+  return `${BASE_IMAGE_MENU}/${raw}`;
 };
 
 const CategoryBadge = ({ category }: { category: string }) => {
@@ -71,7 +83,6 @@ const MenuPage = async ({ searchParams }: PageProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Search */}
       <div className="p-6 rounded-2xl border border-[#E8E2D9] bg-white shadow-2xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -88,80 +99,80 @@ const MenuPage = async ({ searchParams }: PageProps) => {
         </div>
       </div>
 
-      {/* Daftar Menu */}
       {menus.length === 0 ? (
         <div className="p-12 rounded-2xl border border-[#E8E2D9] bg-white text-center text-sm text-[#777D78]">
           Belum ada data menu ditemukan.
         </div>
       ) : (
         <div className="space-y-3">
-          {menus.map((data) => (
-            <div
-              key={`menu-${data.id}`}
-              className="p-4 sm:p-5 rounded-2xl bg-white border border-[#E8E2D9] hover:border-[#245F52]/40 transition flex flex-wrap items-center justify-between gap-4 shadow-2xs"
-            >
-              {/* Gambar & Info Utama */}
-              <div className="flex items-center gap-4 min-w-[240px] flex-1">
-                <div className="w-15 h-15 rounded-xl overflow-hidden bg-[#FFF9F2] border border-[#E8E2D9] shrink-0 flex items-center justify-center">
-                  {data.picture ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={`${BASE_IMAGE_MENU}/${data.picture}`}
-                      alt={data.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <UtensilsCrossed className="w-6 h-6 text-[#245F52]/40" />
-                  )}
-                </div>
+          {menus.map((data) => {
+            const imgRaw = data.imageUrl || data.picture;
 
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-extrabold text-sm text-[#292D2B]">{data.name}</span>
-                    <CategoryBadge category={data.category} />
-                    <span
-                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                        data.isAvailable
-                          ? "bg-[#DFF2E5] text-[#246B40]"
-                          : "bg-[#FCE5E3] text-[#B93832]"
-                      }`}
-                    >
-                      {data.isAvailable ? "Tersedia" : "Habis / Nonaktif"}
-                    </span>
+            return (
+              <div
+                key={`menu-${data.id}`}
+                className="p-4 sm:p-5 rounded-2xl bg-white border border-[#E8E2D9] hover:border-[#245F52]/40 transition flex flex-wrap items-center justify-between gap-4 shadow-2xs"
+              >
+                <div className="flex items-center gap-4 min-w-[240px] flex-1">
+                  <div className="w-15 h-15 rounded-xl overflow-hidden bg-[#FFF9F2] border border-[#E8E2D9] shrink-0 flex items-center justify-center">
+                    {imgRaw ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={resolveMenuImg(imgRaw)}
+                        alt={data.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UtensilsCrossed className="w-6 h-6 text-[#245F52]/40" />
+                    )}
                   </div>
-                  <p className="text-xs text-[#245F52] font-bold mt-0.5">
-                    {data.canteen?.name || `Kantin #${data.canteenId}`}
-                  </p>
-                  {data.description && (
-                    <p className="text-xs text-[#777D78] line-clamp-1 mt-0.5">
-                      {data.description}
+
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-extrabold text-sm text-[#292D2B]">{data.name}</span>
+                      <CategoryBadge category={data.category} />
+                      <span
+                        className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                          data.isAvailable
+                            ? "bg-[#DFF2E5] text-[#246B40]"
+                            : "bg-[#FCE5E3] text-[#B93832]"
+                        }`}
+                      >
+                        {data.isAvailable ? "Tersedia" : "Habis / Nonaktif"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#245F52] font-bold mt-0.5">
+                      {data.canteen?.name || `Kantin #${data.canteenId}`}
                     </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Harga & Kuota */}
-              <div className="flex items-center gap-5 ml-auto sm:ml-0">
-                <div className="text-left sm:text-right">
-                  <p className="text-base font-extrabold text-[#245F52]">
-                    {formatRupiah(data.price)}
-                  </p>
-                  <p className="text-[11px] font-medium text-[#777D78]">
-                    Kuota:{" "}
-                    {data.dailyQuota !== null && data.dailyQuota !== undefined
-                      ? `${data.dailyQuota} porsi/hari`
-                      : "Tanpa batas"}
-                  </p>
+                    {data.description && (
+                      <p className="text-xs text-[#777D78] line-clamp-1 mt-0.5">
+                        {data.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Aksi */}
-                <div className="flex items-center gap-2">
-                  <EditMenu selectedMenu={data} canteens={canteens} />
-                  <DeleteMenu selectedMenu={data} />
+                <div className="flex items-center gap-5 ml-auto sm:ml-0">
+                  <div className="text-left sm:text-right">
+                    <p className="text-base font-extrabold text-[#245F52]">
+                      {formatRupiah(data.price)}
+                    </p>
+                    <p className="text-[11px] font-medium text-[#777D78]">
+                      Kuota:{" "}
+                      {data.dailyQuota !== null && data.dailyQuota !== undefined
+                        ? `${data.dailyQuota} porsi/hari`
+                        : "Tanpa batas"}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <EditMenu selectedMenu={data} canteens={canteens} />
+                    <DeleteMenu selectedMenu={data} />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

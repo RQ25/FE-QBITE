@@ -35,6 +35,14 @@ const STATUS_META: Record<OrderStatus, { label: string; badgeClass: string }> = 
   COMPLETED: { label: "Completed", badgeClass: "badge-completed" },
 };
 
+const resolveImageSrc = (src: string | null | undefined, basePrefix: string) => {
+  if (!src) return "";
+  if (src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://")) {
+    return src;
+  }
+  return `${basePrefix}/${src}`;
+};
+
 export default function TransaksiPage() {
   const [orders, setOrders] = useState<ExtendedOrder[]>([]);
   const [sessions, setSessions] = useState<IOrderSession[]>([]);
@@ -90,7 +98,6 @@ export default function TransaksiPage() {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Auto-fokus input PIN saat modal penyerahan dibuka
   useEffect(() => {
     if (completeOrder) {
       setTimeout(() => {
@@ -145,7 +152,6 @@ export default function TransaksiPage() {
     }
   };
 
-  // Handler PIN berurutan (hanya terima angka, isi & hapus selalu urut kiri <-> kanan)
   const handleSequentialPinChange = (raw: string) => {
     const digitsOnly = raw.replace(/\D/g, "").slice(0, 4);
     setPinValue(digitsOnly);
@@ -206,12 +212,13 @@ export default function TransaksiPage() {
       o.customerName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Quick Status Counts untuk Tab Cepat
   const waitingCount = orders.filter((o) => o.status === "WAITING_VERIFICATION").length;
   const paidCount = orders.filter((o) => o.status === "PAID").length;
   const unexportedCount = orders.filter(
     (o) => (o.status === "PAID" || o.status === "COMPLETED") && !o.isExported
   ).length;
+
+  const selectedProofRaw = selectedOrder?.proofImageUrl || selectedOrder?.paymentProof;
 
   return (
     <div className="space-y-5">
@@ -371,7 +378,6 @@ export default function TransaksiPage() {
 
                   return (
                     <tr key={order.id} className="hover:bg-[#FFF9F2]/70 transition align-top">
-                      {/* Kolom 1: Kode Order & Sesi */}
                       <td className="py-4 px-4 whitespace-nowrap">
                         <span className="font-mono font-extrabold text-sm text-[#245F52] block">
                           {order.orderCode}
@@ -386,7 +392,6 @@ export default function TransaksiPage() {
                         )}
                       </td>
 
-                      {/* Kolom 2: Pemesan */}
                       <td className="py-4 px-4">
                         <p className="font-bold text-[#292D2B]">{order.customerName}</p>
                         <p className="text-[11px] text-[#777D78]">{order.customerPhone}</p>
@@ -397,7 +402,6 @@ export default function TransaksiPage() {
                         )}
                       </td>
 
-                      {/* Kolom 3: Metode Ambil */}
                       <td className="py-4 px-4 whitespace-nowrap">
                         {isSelfPickup ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#DFF2E5] text-[#246B40] text-[11px] font-bold">
@@ -410,7 +414,6 @@ export default function TransaksiPage() {
                         )}
                       </td>
 
-                      {/* Kolom 4: Item Menu */}
                       <td className="py-4 px-4 min-w-[210px]">
                         <div className="space-y-1">
                           {order.items.map((item) => (
@@ -425,7 +428,6 @@ export default function TransaksiPage() {
                         </div>
                       </td>
 
-                      {/* Kolom 5: Nominal */}
                       <td className="py-4 px-4 whitespace-nowrap">
                         <span className="font-extrabold text-sm text-[#292D2B] block">
                           {formatRupiah(order.totalAmount)}
@@ -435,7 +437,6 @@ export default function TransaksiPage() {
                         </span>
                       </td>
 
-                      {/* Kolom 6: Semantic Status */}
                       <td className="py-4 px-4 whitespace-nowrap">
                         <span
                           className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-extrabold ${meta.badgeClass}`}
@@ -444,7 +445,6 @@ export default function TransaksiPage() {
                         </span>
                       </td>
 
-                      {/* Kolom 7: Aksi Cepat */}
                       <td className="py-4 px-4 whitespace-nowrap text-right">
                         <div className="inline-flex items-center gap-2">
                           <a
@@ -527,14 +527,16 @@ export default function TransaksiPage() {
             </div>
 
             <div className="relative w-full h-80 rounded-xl overflow-hidden bg-[#FFF9F2] border border-[#E8E2D9] flex items-center justify-center p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`${BASE_IMAGE_PROOF}/${
-                  selectedOrder.proofImageUrl || selectedOrder.paymentProof
-                }`}
-                alt="Bukti Transfer QRIS"
-                className="max-h-full max-w-full object-contain rounded-lg"
-              />
+              {selectedProofRaw ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={resolveImageSrc(selectedProofRaw, BASE_IMAGE_PROOF)}
+                  alt="Bukti Transfer QRIS"
+                  className="max-h-full max-w-full object-contain rounded-lg"
+                />
+              ) : (
+                <p className="text-xs text-[#777D78]">Tidak ada gambar bukti transfer.</p>
+              )}
             </div>
 
             {rejectMode && (
@@ -621,7 +623,6 @@ export default function TransaksiPage() {
               </p>
             </div>
 
-            {/* Single Sequential Input + 4 Visual Slots (Selalu isi & hapus urut kiri <-> kanan) */}
             <div
               onClick={focusSequentialPin}
               className="relative flex justify-center gap-3 cursor-text select-none py-1"
